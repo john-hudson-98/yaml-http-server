@@ -90,6 +90,24 @@ export default async () : Promise<any> => {
 }
 ```
 
+## React Apps & MicroApps
+Use a running webpack server, or a built app. Very simple to setup. 
+```yaml
+controller:
+  name: TestController
+  endpoints:
+    home:
+      route: /webapp/*
+      type: spa # for Single Page Application
+      directory: test-service/webapp
+      fallback: index.html
+      spaConfig:
+        hasWebpackServer: false # or true, set to true if using create-react-app
+        port: 3000 # what port is the server running on
+        start-dev: npm start # how do we start the app
+        project-directory: null # path to the webpack-server nodejs app.
+```
+
 
 ## Upcoming features
  - New Data Sources - Currently only supports mysql, but allows for the creation of custom adapters, pretty easily.

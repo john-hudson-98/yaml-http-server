@@ -132,7 +132,7 @@ export class AppState {
                     matchedEndpoint = endpoint
                     return true
                 }
-                if (endpoint.type === 'static') {
+                if (endpoint.type === 'static' || endpoint.type === 'spa') {
                     if (endpoint.route.includes('*')) {
                         const sub = endpoint.route.substring(0 , endpoint.route.indexOf('*') - 1)
 

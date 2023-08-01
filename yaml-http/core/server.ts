@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import { Repository } from './appstate/repository'
 import { DataSourceResource } from './appstate/data-source'
 import { StaticWebsite } from './static-website'
+import { SinglePageAppWebsite } from './spa-website'
 
 export type ApplicationConfiguration = {
     controllers?: string[],
@@ -246,7 +247,22 @@ export class Server {
                 // request should be completed by this handler
                 staticApp.handle(request, response)
                 return
-            break;
+            case 'spa':
+                if (!endpoint.directory || !fs.existsSync('src/' + endpoint.directory)) {
+                    this.error(response, 'No directory exists, or is given to the endpoint, the website will not load until there\'s a directory to serve your app from')
+                    return
+                }
+                if (endpoint.spaConfig && endpoint.spaConfig.hasWebpackServer) {
+                    this.error(response, 'this area isn\'t ready yet')
+                    return
+                } else {
+                    const spaApp = new SinglePageAppWebsite(endpoint)
+
+                    // request should be completed by this handler
+                    spaApp.handle(request, response)
+                    return
+                }
+            break
         }
         response.end(JSON.stringify({ error: 'Cannot handle the request' }))
     }
