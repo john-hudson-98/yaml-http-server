@@ -6,6 +6,7 @@ import { Endpoint } from './appstate/controller'
 import fs from 'node:fs'
 import { Repository } from './appstate/repository'
 import { DataSourceResource } from './appstate/data-source'
+import { StaticWebsite } from './static-website'
 
 export type ApplicationConfiguration = {
     controllers?: string[],
@@ -152,10 +153,11 @@ export class Server {
         const endpoint:Endpoint | null = this.appState.getEndpointByUrl(request.url?.split('?')[0]!)
         
         if (!endpoint) {
+            console.log('404 not found' , endpoint)
             response.end(fs.readFileSync('yaml-http/errors/404.html' , 'utf-8'))
             return
         }
-        if (!endpoint.action) {
+        if (endpoint.type === 'api' && !endpoint.action) {
             response.end(fs.readFileSync('yaml-http/errors/404.html' , 'utf-8'))
             return
         }
@@ -189,9 +191,9 @@ export class Server {
         }
         switch(endpoint.type) {
             case 'api':
-                if (endpoint.action.includes('::')) {
+                if (endpoint.action!.includes('::')) {
                     // probably a repository
-                    const [repository, method] = endpoint.action.split('::')
+                    const [repository, method] = endpoint.action!.split('::')
 
                     const repo:Repository | null = this.appState.getRepository(repository)
 
@@ -234,7 +236,17 @@ export class Server {
                     }
                     return
                 }
-            break
+            case 'static':
+                if (!endpoint.directory || !fs.existsSync('src/' + endpoint.directory)) {
+                    this.error(response, 'No directory exists, or is given to the endpoint, the website will not load until there\'s a directory to serve your app from')
+                    return
+                }
+                const staticApp = new StaticWebsite(endpoint)
+
+                // request should be completed by this handler
+                staticApp.handle(request, response)
+                return
+            break;
         }
         response.end(JSON.stringify({ error: 'Cannot handle the request' }))
     }

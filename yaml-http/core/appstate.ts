@@ -128,10 +128,19 @@ export class AppState {
         this.controllers.some((controller:Controller) => {
             Object.keys(controller.endpoints).some((endpointName: string) => {
                 const endpoint = controller.endpoints[endpointName]
-
                 if (this.isRouteMatch(url , endpoint.route)) {
                     matchedEndpoint = endpoint
                     return true
+                }
+                if (endpoint.type === 'static') {
+                    if (endpoint.route.includes('*')) {
+                        const sub = endpoint.route.substring(0 , endpoint.route.indexOf('*') - 1)
+
+                        if (url.substring(0 , sub.length) == sub) {
+                            matchedEndpoint = endpoint
+                            return true
+                        }
+                    }
                 }
             })
             return matchedEndpoint

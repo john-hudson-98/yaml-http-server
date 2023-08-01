@@ -4,6 +4,7 @@ export type Endpoint = {
     action?: string,
     arguments?: Record<string,string|Array<any>>,
     preAuthorize?: string
+    directory?: string
 }
 
 export type Controller = {
