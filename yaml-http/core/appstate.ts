@@ -98,7 +98,7 @@ export class AppState {
                             })
                             .catch(reject)
                         } else {
-                            const {MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB} = process.env
+                            const {MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB} = process.env // alter this ASAP
                             def.connect(MYSQL_HOST!, MYSQL_USER!, MYSQL_PASSWORD!, MYSQL_DB!)
                             .then(() => {
                                 ResourcePool.Get().addDataSource(dbService, def)
