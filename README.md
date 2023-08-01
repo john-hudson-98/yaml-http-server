@@ -1,6 +1,33 @@
 # YAML based HTTP/HTTPS Server
 Low code and maintainence is always a benefit, rapidly spin up websites with this simple server software. 
 
+## Application setup
+Creating an application is easy, you basically list your applications schema in the `src/application.yaml` as below
+```yaml
+application:
+  controllers:
+    - service-1/controllers
+    - service-2/controllers
+  repositories:
+    - service-1/repository
+    - service-2/repository
+  resources:
+    mysql:
+      npm-package: mysql
+      auth-type: embedded
+      host: 127.0.0.1
+      user: root
+      password: password
+      port: 3306
+      schema: yaml_http_test
+server:
+  unsecurePort: 80
+  securePort: 443
+  ssl: 
+    key: ''
+    certificate: ''
+```
+
 ## YAML Based Repositories
 ```yaml
 repository:
