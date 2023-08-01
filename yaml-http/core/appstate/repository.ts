@@ -33,11 +33,19 @@ export class RepositoryInstance {
     }
 }
 
+export type RepositoryEventTrigger = {
+    stage: 'before' | 'after',
+    eventName: string,
+    detail: Record<string,any>,
+    from: string
+}
+
 export type RepositoryMethod = {
     name: string,
     resource: string,
     arguments?: Record<string, string|number>,
     query?: string
+    triggers?: RepositoryEventTrigger[]
 }
 
 export type Repository = {

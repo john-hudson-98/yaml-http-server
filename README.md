@@ -113,8 +113,6 @@ controller:
  - New Data Sources - Currently only supports mysql, but allows for the creation of custom adapters, pretty easily.
  - Event House Integration - On Controllers and Repositories, allow a preExecute, and postExecute event dispatcher
  - Queueing tool - Allow custom queues to be setup
- - React/SPA Integration - Easy micro-app setup for React/Vue or any other webpack bundled microapps. 
- - Static resources - Serving a website from a directory.
  - External File Service - Add custom file hosting services with configurability on type and size.
 
 ### Contributors
