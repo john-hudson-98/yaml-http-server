@@ -5,7 +5,6 @@ import { AppState } from './appstate'
 import { Endpoint } from './appstate/controller'
 import fs from 'node:fs'
 import { Repository } from './appstate/repository'
-import { DataSourceResource } from './appstate/data-source'
 import { StaticWebsite } from './static-website'
 import { SinglePageAppWebsite } from './spa-website'
 import zlib from 'node:zlib'
@@ -13,7 +12,8 @@ import zlib from 'node:zlib'
 export type ApplicationConfiguration = {
     controllers?: string[],
     repositories?: string[],
-    resources?: Record<string, any>
+    resources?: Record<string, any>,
+    migration?: Array<string>
 }
 
 export class Server {
@@ -225,7 +225,6 @@ export class Server {
 
                 } else {
                     // more than likely a script
-
                     try{
                         const handle = (await import('./../../src/' + endpoint.action)).default
 

@@ -5,6 +5,7 @@ import yaml from 'yaml'
 import fs from 'node:fs'
 import { DataSource, DataSourceCredentials, DataSourceResource } from './appstate/data-source'
 import { ResourcePool } from './resource-pool'
+import { runMigration } from './migration'
 
 export class AppState {
     
@@ -55,6 +56,11 @@ export class AppState {
                 conn.then((connection:DataSource | null) => {
                     if (!connection) {
                         throw new Error('Cannot connect to the resource ' + dbService + ', returned null?')
+                    }
+
+                    if (process.argv.includes('--install')) {
+                        console.log('Running installer')
+                        runMigration(appContext.migration! , dbService)
                     }
                 }).catch((err:unknown) => {
                     console.error(err)

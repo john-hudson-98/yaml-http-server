@@ -1,5 +1,7 @@
 import { DataSource } from '../appstate/data-source'
 import mysql, {Connection} from 'mysql'
+import { MigrationColumn, MigrationTable } from '../migration'
+import { ResourcePool } from '../resource-pool'
 
 export default class Mysql implements DataSource {
     
@@ -50,13 +52,42 @@ export default class Mysql implements DataSource {
             resolve(this)
         })
     }
+    install(tableName:string, structure: MigrationTable): Promise<boolean> {
+        let query = `CREATE TABLE IF NOT EXISTS ${tableName} (`
+
+        Object.keys(structure.structure).forEach((columnName:string, idx:number) => {
+            const column:MigrationColumn = structure.structure[columnName]
+
+            query += idx > 0 ? ', ' : ''
+            query += `${columnName} ${column.type} ${column.null ? 'NULL' : 'NOT NULL'} ${column['auto-increment'] ? 'AUTO_INCREMENT' : ''} ${column.unique ? 'UNIQUE' : ''}`
+        })
+        if (structure.keys) {
+            if (structure.keys.primary) {
+                query += ', PRIMARY KEY (' + structure.keys.primary + ')'
+            }
+            if (structure.keys.unique) {
+                Object.keys(structure.keys.unique).forEach((keyName:string) => {
+                    query += ', UNIQUE ' + keyName + ' (' + structure.keys.unique.join(', ') + ')'
+                })
+            }
+        }
+        query += ')'
+
+        return new Promise<boolean>((resolve) => {
+            this.query(query).then(() => {
+                console.log('[SUCCESS][MYSQL::INSTALL] ' + tableName)
+                resolve(true)
+            }).catch((err) => {
+                console.error('[ERROR][MYSQL::INSTALL] ' + err)
+                resolve(false)
+            })
+        })
+    }
     query(query: string , binds: Record<string, any> | undefined = {}): Promise<Record<string, any>[]> {
         return new Promise<Record<string, any>[]>((resolve , reject) => {
             Object.keys(binds).forEach((key:string) => {
                 query = query.split(':' + key).join(`'${binds[key].split("'").join("\\'")}'`)
             })
-
-            console.log(query)
             this.db?.query(query , (error , results) => {
                 if (error) {
                     reject(error)

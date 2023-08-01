@@ -1,3 +1,4 @@
+import { MigrationTable } from "../migration"
 
 /**
  * Use this to generalize all database connection adapters, 
@@ -8,6 +9,7 @@ export interface DataSource {
     connect(host:string, user:string, password:string, database:string, port?:number) : Promise<DataSource>
     disconnect() : Promise<DataSource>
     query(query:string, binds:Record<string,any> | undefined) : Promise<Array<Record<string,any>>>
+    install(tableName:string, structure:MigrationTable) : Promise<boolean>
 }
 
 export type DataSourceResource = {
