@@ -81,7 +81,7 @@ controller:
     home:
       route: / # allows wildcarding and path variables too!
       type: api # api, static and external-api's supported, make micro-services easier!
-      action: test-service/actions/test-action.ts # TestRepository::tables method
+      action: test-service/actions/test-action.ts # path to handler
 ```
 And the test-action.ts file:
 ```typescript
