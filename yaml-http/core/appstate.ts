@@ -145,6 +145,11 @@ export class AppState {
             })
             return matchedEndpoint
         })
+        if (!matchedEndpoint && url !== '/') {
+            // attempt to fall back on the homepage
+            const fallback = this.getEndpointByUrl('/');
+            return fallback
+        }
         return matchedEndpoint
     }
 

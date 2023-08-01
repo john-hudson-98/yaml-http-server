@@ -2,6 +2,7 @@
   "dependencies": {
     "@types/mysql": "^2.15.21",
     "@types/node": "^20.4.5",
+    "gzip": "^0.1.0",
     "mysql": "^2.18.1",
     "yaml": "^2.3.1"
   }

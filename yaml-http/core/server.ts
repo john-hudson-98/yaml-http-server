@@ -8,6 +8,7 @@ import { Repository } from './appstate/repository'
 import { DataSourceResource } from './appstate/data-source'
 import { StaticWebsite } from './static-website'
 import { SinglePageAppWebsite } from './spa-website'
+import zlib from 'node:zlib'
 
 export type ApplicationConfiguration = {
     controllers?: string[],
@@ -253,7 +254,41 @@ export class Server {
                     return
                 }
                 if (endpoint.spaConfig && endpoint.spaConfig.hasWebpackServer) {
-                    this.error(response, 'this area isn\'t ready yet')
+
+                    if (endpoint.route === '/') {
+                        // its a homepage/main website app.
+                        const path = request.url?.split('?')[0]
+
+                        http.request({
+                            host: '127.0.0.1',
+                            headers: request.headers,
+                            port: endpoint.spaConfig.port,
+                            path: path,
+                        } , (spaServerResponse: IncomingMessage) => {
+                            response.writeHead(spaServerResponse.statusCode! , {
+                                'content-type': spaServerResponse.headers['content-type']
+                            })
+                            
+                            const gunzip = zlib.createGunzip();            
+                            spaServerResponse.pipe(gunzip);
+                            let buffer: string[] = []
+                            gunzip.on('data', (data) => {
+                                // decompression chunk ready, add it to the buffer
+                                buffer.push(data.toString())
+
+                            }).on("end", function() {
+                                // response and decompression complete, join the buffer and return
+                                response.end(buffer.join(''))
+                            }).on("error", (e) => {
+                                this.error(response, e.message)
+                            })
+                            
+                        }).end()
+                        return
+                    } else {
+                        // we need to reroute the requests accordingly
+                        this.error(response, 'this functionality isn\'t available yet')
+                    }
                     return
                 } else {
                     const spaApp = new SinglePageAppWebsite(endpoint)
