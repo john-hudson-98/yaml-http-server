@@ -51,9 +51,47 @@ controller:
         SCHEMA: INFORMATION_SCHEMA # or [$POST.SCHEMA, $GET.SCHEMA, $PATH.SCHEMA], easy customisation
 ```
 
+## Pre Authorise
+I've now added the ability to run a custom typescript handler to authorize a web request.
+Simply create the file auth.ts in the location you'd like it.
+```typescript
+export default async () : Promise<Boolean> => {
+    return true
+}
+```
+Then reference it in the controller. 
+```yaml
+controller:
+  name: TestController
+  endpoints:
+    home:
+      preAuthorize: 'test-service/authorisers/auth.ts'
+      route: / # allows wildcarding and path variables too!
+      type: api # api, static and external-api's supported, make micro-services easier!
+      action: TestRepository::tables # TestRepository::tables method
+```
+
+## Custom TS handlers
+If you want custom logic and don't want to rely on a repository, this can be achieved here.
+
+```yaml
+controller:
+  name: TestController
+  endpoints:
+    home:
+      route: / # allows wildcarding and path variables too!
+      type: api # api, static and external-api's supported, make micro-services easier!
+      action: test-service/actions/test-action.ts # TestRepository::tables method
+```
+And the test-action.ts file:
+```typescript
+export default async () : Promise<any> => {
+    return '<p>Hello World</p>'
+}
+```
+
+
 ## Upcoming features
- - Pre Authorize - Add a custom authorizer to protect your endpoints
- - TS/JS Methods - Add a custom TS/JS function to allow more configurability
  - New Data Sources - Currently only supports mysql, but allows for the creation of custom adapters, pretty easily.
  - Event House Integration - On Controllers and Repositories, allow a preExecute, and postExecute event dispatcher
  - Queueing tool - Allow custom queues to be setup

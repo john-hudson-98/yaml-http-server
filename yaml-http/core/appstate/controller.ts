@@ -2,7 +2,8 @@ export type Endpoint = {
     route: string,
     type: 'api' | 'dynamic' | 'static',
     action?: string,
-    arguments?: Record<string,string|Array<any>>
+    arguments?: Record<string,string|Array<any>>,
+    preAuthorize?: string
 }
 
 export type Controller = {

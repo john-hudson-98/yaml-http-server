@@ -159,6 +159,34 @@ export class Server {
             response.end(fs.readFileSync('yaml-http/errors/404.html' , 'utf-8'))
             return
         }
+        if (endpoint.preAuthorize && typeof endpoint.preAuthorize === 'string') {
+            // will be adding cookie & session soon!
+
+            const imp = (await import('./../../src/' + endpoint.preAuthorize)).default;
+
+            const isAuthorized = await imp({
+                request,
+                data,
+            });
+            if (!isAuthorized) {
+                switch(endpoint.type){
+                    case 'api':
+                        response.writeHead(404 , {
+                            'Content-Type': 'text/html'
+                        })
+                        response.end(JSON.stringify({ error: 'Not authorised' }));
+                    break;
+                    case 'dynamic':
+                    case 'static':
+                        response.writeHead(404 , {
+                            'Content-Type': 'application/json'
+                        })
+                        response.end(fs.readFileSync('yaml-http/errors/404.html' , 'utf-8'))
+                    break;
+                }
+                return
+            }
+        }
         switch(endpoint.type) {
             case 'api':
                 if (endpoint.action.includes('::')) {
@@ -186,7 +214,6 @@ export class Server {
                     } else {
                         results = await repo.instance.execute(method, {})
                     }
-                    console.log(results)
 
                     response.setHeader('Content-Type' , 'application/json')
                     response.end(JSON.stringify(results))
@@ -194,10 +221,22 @@ export class Server {
 
                 } else {
                     // more than likely a script
+
+                    try{
+                        const handle = (await import('./../../src/' + endpoint.action)).default
+
+                        const resp = await handle();
+
+                        response.end(resp);
+                    } catch(e:unknown) {
+                        console.log("Cannot import " + endpoint.action)
+                        this.error(response, 'Cannot import ' + endpoint)
+                    }
+                    return
                 }
             break
         }
-        response.end('p')
+        response.end(JSON.stringify({ error: 'Cannot handle the request' }))
     }
     error(response:ServerResponse, error:string) {
         response.end(fs.readFileSync('yaml-http/errors/500.html' , 'utf-8').split('#error#').join(error))
