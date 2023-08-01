@@ -6,11 +6,11 @@ Creating an application is easy, you basically list your applications schema in 
 ```yaml
 application:
   controllers:
-    - service-1/controllers
-    - service-2/controllers
+    - service-1/controllers # this points to a directory, not a yaml file
+    - service-2/controllers # this points to a directory, not a yaml file
   repositories:
-    - service-1/repository
-    - service-2/repository
+    - service-1/repository # this points to a directory, not a yaml file
+    - service-2/repository # this points to a directory, not a yaml file
   resources:
     mysql:
       npm-package: mysql
@@ -110,7 +110,7 @@ controller:
 
 ## Migration and Seeding
 You can create tables in your application by running `ts-node index --install`. This will force the migration tool to run.
-Here's an example in MySQL:
+Here's an example for a MySQL table:
 ```yaml
 tables:
   user:
@@ -136,6 +136,33 @@ tables:
         unique: true
     keys:
       primary: user_id
+```
+
+this simply needs adding in your `src/application.yaml` file:
+```yaml
+application:
+  controllers:
+    - test-service/controller # this points to a directory, not a yaml file
+  repositories:
+    - test-service/repository # this points to a directory, not a yaml file
+  resources:
+    mysql:
+      npm-package: mysql
+      auth-type: embedded
+      host: 127.0.0.1
+      user: root
+      password: password
+      port: 3306
+      schema: yaml_http_test
+  migration:
+    - test-service/install # this points to a directory, not a yaml file
+server:
+  unsecurePort: 80
+  securePort: 443
+  ssl: 
+    key: ''
+    certificate: ''
+  
 ```
 
 ## Upcoming features
