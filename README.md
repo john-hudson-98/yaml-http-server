@@ -108,6 +108,35 @@ controller:
         project-directory: null # path to the webpack-server nodejs app.
 ```
 
+## Migration and Seeding
+You can create tables in your application by running `ts-node index --install`. This will force the migration tool to run.
+Here's an example in MySQL:
+```yaml
+tables:
+  user:
+    resource: mysql
+    structure:
+      user_id:
+        type: INT(11)
+        auto-increment: true
+        null: false
+      email:
+        type: VARCHAR(255)
+        unique: true
+        null: false
+      password:
+        type: VARCHAR(255)
+        null: false
+      name:
+        type: VARCHAR(255)
+        null: false
+      telephone:
+        type: VARCHAR(255)
+        null: true
+        unique: true
+    keys:
+      primary: user_id
+```
 
 ## Upcoming features
  - New Data Sources - Currently only supports mysql, but allows for the creation of custom adapters, pretty easily.
